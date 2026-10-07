@@ -1,83 +1,141 @@
-# Marketing_advisor
+# Creator Advice Agent — Demo
 
-# Marketing Advisor
+A simple demo web app: type a creator goal in plain language, get back
+**structured, actionable video advice** — not a generic chatbot reply.
 
-An AI agent that analyzes current trends across different niches and gives you data-backed insights on **what videos to create next**.
+> Example input: *"I want to get popular in the gaming niche on YouTube"*
+>
+> Output: niche identified → trend summary → 3–5 video ideas (each with an
+> angle and reasoning) → concrete next steps, rendered as clean cards.
 
-## Overview
+Stateless demo: no database, no accounts, no auth. Trend advice comes from
+the LLM's general knowledge for now — see **Phase 2** below.
 
-Creating content that performs well starts with knowing what's trending. Marketing Advisor automates that research: it looks at trend data for a niche you choose, identifies what's gaining traction, and turns it into actionable video ideas.
+## Project structure
 
-## Features
+```
+creator-advice-agent/
+├── app.py                  # Flask backend: routes, LLM prompt, JSON validation
+├── requirements.txt
+├── .env.example            # copy to .env and add your key
+├── templates/
+│   └── index.html          # single input page + results layout
+└── static/
+    ├── style.css
+    └── app.js              # calls /api/advice, renders cards, shows errors
+```
 
-- **Niche trend analysis**: track what's rising in niches like fitness, tech, finance, food, and more
-- **Video idea generation**: get suggested topics, titles, and angles based on current trends
-- **Insight summaries**: understand *why* a topic is trending and who it appeals to
-- **Multi-niche support**: switch between niches or compare them side by side
+## Setup
 
-## How It Works
-
-1. **Input**: you choose a niche (e.g. "personal finance").
-2. **Collect**: the agent gathers trend data from your configured sources.
-3. **Analyze**: an LLM identifies patterns, rising topics, and content gaps.
-4. **Output**: you receive a report with trend insights and recommended video ideas.
-
-## Getting Started
-
-### Prerequisites
-
-- Python 3.10+
-- An API key for your LLM provider
-- API keys for any trend data sources you use
-
-### Installation
+Requires Python 3.10+.
 
 ```bash
-git clone https://github.com/Thesrijan-bit/Marketing_advisor.git
-cd Marketing_advisor
+cd creator-advice-agent
+
+# 1. Create and activate a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+
+# 2. Install dependencies
 pip install -r requirements.txt
+
+# 3. Configure your API key (never hardcode it, never commit .env)
+cp .env.example .env
+# then edit .env and set LLM_API_KEY=sk-...
 ```
 
-### Configuration
+Any OpenAI-compatible provider works. To use a different one, set
+`LLM_BASE_URL` and `LLM_MODEL` in `.env` (see `.env.example`).
 
-Create a `.env` file in the project root:
+### No API key? Demo mode
 
-```
-LLM_API_KEY=your_api_key_here
-TREND_API_KEY=your_trend_source_key_here
-```
+If no key is set (or `MOCK_LLM=true`), the app still runs and returns
+clearly-labelled **sample output**, so you can demo the full flow
+(input → structured cards) without a key. Add a key for real AI advice.
 
-### Usage
+## Run it
 
 ```bash
-python main.py --niche "personal finance"
+python app.py
 ```
 
-## Example Output
+Open http://127.0.0.1:5000, type a goal, and click **Get video ideas**.
 
+Health check: http://127.0.0.1:5000/health
+
+## API
+
+### `POST /api/advice`
+
+Request:
+
+```json
+{ "goal": "I want to get popular in the gaming niche on YouTube" }
 ```
-Niche: Personal Finance
 
-Top Trends:
-1. Budgeting with the envelope method (rising)
-2. Side hustles for students (steady)
+Response (`200`):
 
-Suggested Videos:
-- "I Tried the Envelope Method for 30 Days"
-- "5 Side Hustles You Can Start This Weekend"
+```json
+{
+  "niche_identified": "Gaming",
+  "trend_summary": "2–3 sentences on what's likely working in this niche now…",
+  "video_ideas": [
+    {
+      "title": "Suggested video title",
+      "angle": "Why this angle/format could work",
+      "reasoning": "What signal or pattern this idea is based on"
+    }
+  ],
+  "next_steps": ["Concrete action item", "Another action item"],
+  "demo_mode": false
+}
 ```
 
-## Roadmap
+Errors are friendly JSON, never a stack trace:
 
-- [ ] Add more trend data sources
-- [ ] Generate full video scripts and hooks
-- [ ] Build a simple web dashboard
-- [ ] Schedule automatic weekly reports
+| Case | Status | Body |
+|---|---|---|
+| Empty goal | `400` | `{"error": "Please describe your goal first…"}` |
+| Goal over 500 chars | `400` | `{"error": "That goal is a bit long…"}` |
+| LLM unreachable / bad key | `502` | `{"error": "We couldn't reach the AI service…"}` |
+| LLM returns malformed/incomplete JSON | `502` | `{"error": "The AI returned a response we couldn't read…"}` |
 
-## Contributing
+Try it from the terminal:
 
-Contributions are welcome! Open an issue to discuss a change, or submit a pull request.
+```bash
+curl -s -X POST http://127.0.0.1:5000/api/advice \
+  -H "Content-Type: application/json" \
+  -d '{"goal": "I want to get popular in the gaming niche on YouTube"}'
+```
 
-## License
+## How it works
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+1. The frontend sends the goal to `POST /api/advice`.
+2. `app.py` builds a system prompt that requires **JSON only**, in the exact
+   schema above (with `response_format: json_object` where supported).
+3. The response is parsed defensively in `parse_llm_json()` — code fences
+   are stripped and every required field is validated.
+4. The frontend renders the JSON as cards, using `textContent` (not
+   `innerHTML`) so LLM output can't inject markup.
+
+## Phase 2 (not in this demo)
+
+Real trend data — YouTube Data API / Google Trends — is intentionally
+**not** integrated yet. The integration point is marked in `app.py`:
+
+```python
+# PHASE 2 — REAL TREND DATA INTEGRATION POINT
+def get_trend_context(niche_hint: str):
+    return None
+```
+
+Implementing that function and passing its result into `build_prompt()`
+is the whole Phase 2 change — no other code needs to move.
+
+## Notes for presenting this demo
+
+- Show the raw JSON (curl command above) next to the card UI — that's the
+  point of the project: an LLM constrained to a useful structure.
+- Try a second niche live (cooking, fitness) to show it's not hardcoded.
+- Be upfront: trend summaries are the model's general knowledge, not live
+  data. That's exactly what Phase 2 fixes.

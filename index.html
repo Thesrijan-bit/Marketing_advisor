@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Creator Advice Agent — Demo</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>🎬 Creator Advice Agent</h1>
+      <p class="subtitle">Type your goal in plain language. Get structured, explained video ideas back — not a wall of chat text.</p>
+    </header>
+
+    <form id="goal-form">
+      <label for="goal">Your goal</label>
+      <textarea id="goal" rows="3" maxlength="500"
+        placeholder="e.g. I want to get popular in the gaming niche on YouTube"></textarea>
+      <div class="examples">
+        Try:
+        <button type="button" class="chip" data-example="I want to get popular in the gaming niche on YouTube">Gaming on YouTube</button>
+        <button type="button" class="chip" data-example="I want to grow a home cooking channel on TikTok">Home cooking on TikTok</button>
+        <button type="button" class="chip" data-example="I want to start a fitness channel for beginners on YouTube">Fitness for beginners</button>
+      </div>
+      <button type="submit" id="submit-btn">Get video ideas</button>
+    </form>
+
+    <p id="status" class="status" hidden></p>
+    <p id="error" class="error" role="alert" hidden></p>
+
+    <section id="results" hidden>
+      <div id="demo-banner" class="demo-banner" hidden>
+        Demo mode: no API key is set, so this is sample output. Add your key (see README) for real AI advice.
+      </div>
+
+      <div class="card">
+        <h2>Niche identified</h2>
+        <p id="niche" class="niche"></p>
+        <h3>What's working right now</h3>
+        <p id="trend-summary"></p>
+      </div>
+
+      <h2 class="section-title">Video ideas</h2>
+      <div id="ideas" class="ideas"></div>
+
+      <div class="card">
+        <h2>Next steps</h2>
+        <ol id="next-steps"></ol>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

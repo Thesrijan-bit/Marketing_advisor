@@ -1,0 +1,27 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, sans-serif; background: #f6f7fb; color: #1c1e26; }
+.container { max-width: 760px; margin: 0 auto; padding: 32px 20px 64px; }
+h1 { margin: 0 0 8px; font-size: 2rem; }
+.subtitle { color: #555a6a; margin: 0 0 28px; line-height: 1.5; }
+form { background: #fff; border: 1px solid #e3e5ee; border-radius: 14px; padding: 20px; }
+label { font-weight: 600; display: block; margin-bottom: 8px; }
+textarea { width: 100%; padding: 12px; border: 1px solid #c9ccd9; border-radius: 10px; font: inherit; resize: vertical; }
+textarea:focus { outline: 2px solid #6c5ce7; outline-offset: 1px; }
+.examples { margin: 12px 0; font-size: .9rem; color: #555a6a; }
+.chip { border: 1px solid #d8daea; background: #f0efff; border-radius: 999px; padding: 5px 11px; margin: 2px; cursor: pointer; font: inherit; font-size: .85rem; }
+.chip:hover { background: #e2dfff; }
+#submit-btn { background: #6c5ce7; color: #fff; border: 0; border-radius: 10px; padding: 12px 18px; font: inherit; font-weight: 600; cursor: pointer; width: 100%; }
+#submit-btn:disabled { opacity: .6; cursor: wait; }
+.status { color: #555a6a; margin-top: 16px; }
+.error { background: #ffecec; border: 1px solid #ffb3b3; color: #8a1f1f; padding: 12px 14px; border-radius: 10px; margin-top: 16px; }
+.demo-banner { background: #fff7d6; border: 1px solid #ecd97a; padding: 12px 14px; border-radius: 10px; margin: 20px 0; font-size: .95rem; }
+.card, .idea-card { background: #fff; border: 1px solid #e3e5ee; border-radius: 14px; padding: 20px; margin-top: 20px; }
+.card h2, .section-title { margin-top: 0; }
+.card h3 { margin-bottom: 6px; }
+.niche { font-size: 1.25rem; font-weight: 700; color: #6c5ce7; margin: 4px 0 16px; }
+.ideas { display: grid; gap: 16px; }
+.idea-card { margin-top: 0; }
+.idea-card h3 { margin: 0 0 10px; line-height: 1.4; }
+.idea-card p { margin: 6px 0; line-height: 1.55; }
+.idea-card .label { font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: #6c5ce7; }
+ol { padding-left: 20px; line-height: 1.7; margin-bottom: 0; }
